@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "coordinate_conventions": {
+    "angles": "radians",
+    "quaternion": "wxyz",
+    "length": "meters"
+  },
+  "passive_joint_defaults": {
+    "armature": 0.01,
+    "damping": 0.05,
+    "frictionloss": 0.2
+  },
+  "robots": {
+    "g1_body23_head2": {
+      "body_dof": 23,
+      "head_dof": 2,
+      "total_actuators": 25,
+      "mjcf": "g1_body23_head2.xml",
+      "retarget_config": "retarget/g1_body23_head2/soma_to_g1_retargeter_config.json"
+    },
+    "g1_body25_head2": {
+      "body_dof": 25,
+      "head_dof": 2,
+      "total_actuators": 27,
+      "mjcf": "g1_body25_head2.xml",
+      "retarget_config": "retarget/g1_body25_head2/soma_to_g1_retargeter_config.json"
+    }
+  }
+}

@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "dollhouse-robots"
+version = "0.1.0"
+description = "Canonical robot definitions and meshes for Dollhouse projects"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "BSD-3-Clause"
+license-files = ["LICENSE", "NOTICE.md"]
+authors = [{name = "Dollhouse Robots"}]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Programming Language :: Python :: 3",
+]
+
+[project.urls]
+Repository = "https://github.com/carlosdp/dollhouse-robots"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+dollhouse_robots = [
+  "unitree_g1/*.xml",
+  "unitree_g1/*.json",
+  "unitree_g1/assets/*.STL",
+  "unitree_g1/assets/*.stl",
+  "unitree_g1/retarget/**/*.json",
+]
+
+[dependency-groups]
+dev = ["mujoco>=3.5.0", "pytest>=8"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
