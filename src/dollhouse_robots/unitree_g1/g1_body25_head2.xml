@@ -188,6 +188,14 @@
             <joint name="waist_pitch_joint" axis="0 1 0" range="-0.52 0.52"/>
             <geom class="visual" mesh="torso_link"/>
             <geom name="torso_collision" class="collision" size="0.09" fromto="0.01 0 0.08 0.01 0 0.2"/>
+            <body name="fisheye_front" pos="0.0526775 0.008499 0.323682" xyaxes="0 -1 0 0 0 1">
+              <site name="fisheye_front" type="sphere" size="0.005"/>
+              <camera name="fisheye_front"/>
+            </body>
+            <body name="fisheye_back" pos="-0.0589185 0.013141 0.321913" xyaxes="0 1 0 0 0 1">
+              <site name="fisheye_back" type="sphere" size="0.005"/>
+              <camera name="fisheye_back"/>
+            </body>
             <body name="head_pan_link" pos="0 0 0.336119">
               <inertial pos="0 0.01108 -0.01025" mass="0.08" diaginertia="2.9e-05 3.4e-05 5.2e-05"/>
               <joint name="head_pan_joint" axis="0 0 1" range="-2.61799 2.61799"/>
