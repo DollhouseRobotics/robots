@@ -49,6 +49,32 @@ def test_definition_contract(robot_id: str, expected_actuators: int) -> None:
 
 
 @pytest.mark.parametrize("robot_id", ["g1_body23_head2", "g1_body25_head2"])
+def test_scalebfm_collision_primitives(robot_id: str) -> None:
+  mujoco = pytest.importorskip("mujoco")
+  model = mujoco.MjModel.from_xml_path(str(get_robot(robot_id).mjcf_path))
+
+  def geom_id(name: str) -> int:
+    return mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_GEOM, name)
+
+  def radius(name: str) -> float:
+    return float(model.geom_size[geom_id(name), 0])
+
+  assert geom_id("torso_collision") < 0
+  assert geom_id("head_pan_collision") < 0
+  assert geom_id("left_wrist_hand_collision") < 0
+  assert radius("torso_collision1") == pytest.approx(0.073)
+  assert radius("torso_collision2") == pytest.approx(0.07)
+  assert radius("torso_collision3") == pytest.approx(0.065)
+  assert radius("head_collision") == pytest.approx(0.068)
+  assert radius("left_wrist_collision") == pytest.approx(0.035)
+  assert radius("right_wrist_collision") == pytest.approx(0.035)
+  assert radius("left_hand_collision") == pytest.approx(0.04)
+  assert radius("right_hand_collision") == pytest.approx(0.04)
+  assert int(model.geom_type[geom_id("left_hand_collision")]) == int(mujoco.mjtGeom.mjGEOM_SPHERE)
+  assert mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_BODY, "left_wrist_pitch_link") < 0
+
+
+@pytest.mark.parametrize("robot_id", ["g1_body23_head2", "g1_body25_head2"])
 def test_mjcf_compiles_with_mujoco(robot_id: str) -> None:
   mujoco = pytest.importorskip("mujoco")
   model = mujoco.MjModel.from_xml_path(str(get_robot(robot_id).mjcf_path))
