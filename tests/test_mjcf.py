@@ -9,7 +9,7 @@ from dollhouse_robots import get_robot
 
 @pytest.mark.parametrize(
   ("robot_id", "expected_actuators"),
-  [("g1_body23_head2", 25), ("g1_body25_head2", 27)],
+  [("g1_body23_head2", 25), ("g1_body25_head2", 27), ("dollhouse_g1_27dof_with_camera_mount", 25)],
 )
 def test_definition_contract(robot_id: str, expected_actuators: int) -> None:
   robot = get_robot(robot_id)
@@ -74,7 +74,7 @@ def test_scalebfm_collision_primitives(robot_id: str) -> None:
   assert mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_BODY, "left_wrist_pitch_link") < 0
 
 
-@pytest.mark.parametrize("robot_id", ["g1_body23_head2", "g1_body25_head2"])
+@pytest.mark.parametrize("robot_id", ["g1_body23_head2", "g1_body25_head2", "dollhouse_g1_27dof_with_camera_mount"])
 def test_mjcf_compiles_with_mujoco(robot_id: str) -> None:
   mujoco = pytest.importorskip("mujoco")
   model = mujoco.MjModel.from_xml_path(str(get_robot(robot_id).mjcf_path))
@@ -109,3 +109,56 @@ def test_25dof_fisheye_mounts_have_expected_world_poses() -> None:
     np.testing.assert_allclose(data.cam_xpos[camera_id], position, atol=1e-9)
     camera_rotation = data.cam_xmat[camera_id].reshape(3, 3)
     np.testing.assert_allclose(-camera_rotation[:, 2], forward, atol=1e-9)
+
+
+@pytest.mark.parametrize("waist_pose", [(0, 0, 0), (0.47, -0.23, 0.31)])
+def test_fixed_cameras_follow_torso_without_head_actuators(waist_pose) -> None:
+  mujoco = pytest.importorskip("mujoco")
+  robot = get_robot("dollhouse_g1_27dof_with_camera_mount")
+  model = mujoco.MjModel.from_xml_path(str(robot.mjcf_path))
+  old = mujoco.MjModel.from_xml_path(str(get_robot("g1_body25_head2").mjcf_path))
+  assert robot.head_dof == 0
+  assert model.nu == 25
+  assert model.nq == 32
+  assert [model.actuator(i).name for i in range(model.nu)] == [
+    old.actuator(i).name for i in range(25)
+  ]
+  for kind, names in (
+    (mujoco.mjtObj.mjOBJ_JOINT, ("head_pan_joint", "head_tilt_joint")),
+    (mujoco.mjtObj.mjOBJ_BODY, ("head_pan_link", "head_tilt_link")),
+    (mujoco.mjtObj.mjOBJ_GEOM, ("head_collision",)),
+  ):
+    for name in names:
+      assert mujoco.mj_name2id(model, kind, name) == -1
+
+  data = mujoco.MjData(model)
+  data.qpos[:3] = [0.8, -0.3, 1.1]
+  data.qpos[3:7] = [np.cos(.19), 0, 0, np.sin(.19)]
+  for axis, value in zip(("yaw", "roll", "pitch"), waist_pose):
+    data.joint(f"waist_{axis}_joint").qpos[0] = value
+  mujoco.mj_forward(model, data)
+  torso = data.body("torso_link")
+  rotation = torso.xmat.reshape(3, 3)
+  # Independently specified nominal torso-relative pupil centers, in meters.
+  for name, x, forward in (
+    ("fisheye_front", .0766, [1, 0, 0]),
+    ("fisheye_back", -.0496, [-1, 0, 0]),
+  ):
+    site = data.site(name)
+    camera = data.camera(name)
+    position = torso.xpos + rotation @ [x, 0, .367399]
+    np.testing.assert_allclose(site.xpos, position, atol=1e-9)
+    np.testing.assert_allclose(camera.xpos, position, atol=1e-9)
+    np.testing.assert_allclose(camera.xmat, site.xmat, atol=1e-9)
+    camera_rotation = camera.xmat.reshape(3, 3)
+    np.testing.assert_allclose(-camera_rotation[:, 2], rotation @ forward, atol=1e-9)
+    np.testing.assert_allclose(camera_rotation[:, 1], rotation @ [0, 0, 1], atol=1e-9)
+
+  retarget = json.loads(robot.retarget_config_path.read_text())
+  assert retarget["target_joint_names"] == [
+    model.joint(model.actuator_trnid[i, 0]).name for i in range(model.nu)
+  ]
+  assert "Neck1" not in retarget["ik_map"]
+  for mapping in retarget["ik_map"].values():
+    for key in ("t_body", "r_body"):
+      assert mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_BODY, mapping[key]) >= 0

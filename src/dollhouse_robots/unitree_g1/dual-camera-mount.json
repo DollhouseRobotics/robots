@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "hardware_repository": "https://github.com/DollhouseRobotics/hardware",
+  "hardware_revision": "dual-camera-neck-mount v4, local hardware working tree dated 2026-10-21",
+  "hardware_manifest": "cad/head-module/dual-camera-mount/manifest.json",
+  "hardware_step_sha256": "d0d8ef5ae50081ab6ae2e4c1b1ca1bd0b5c14beddacf7d9cd446f0ce16063516",
+  "mesh_sources": {
+    "dual-camera-neck-mount.stl": {
+      "source": "parts/head-module/dual-camera-neck-mount.stl",
+      "sha256": "2b2b5835ba6f383c24ea5ad22f9e49e3a5f4b75a05899cf374008e3253386c6a"
+    },
+    "camera-cover.stl": {
+      "source": "parts/head-module/camera-cover.stl",
+      "sha256": "df3698d598d53e6d2b45897ff1643587b3f0f476b7bb353d909f52ce47b96345"
+    }
+  },
+  "cad_frame": "millimeters, +X lateral, +Y rear, +Z up; native coordinates retained",
+  "torso_frame": "meters, +X forward, +Y left, +Z up",
+  "registration": {
+    "status": "nominal socket fit, not physically calibrated",
+    "rotation_wxyz": [0.707106781187, 0, 0, 0.707106781187],
+    "translation_m": [0.075500000358, 0, 0.469141515587],
+    "basis": "CAD foot bottom placed on the torso mesh central horizontal ledge at Z=303.899 mm. Neck axis X=13.5 mm is the midpoint of its X=2..25 mm span; Y=0. Photos establish upright, front/back orientation only. Seating depth and registration require measurement."
+  },
+  "optical_model": {
+    "status": "ideal equidistant, not calibrated to the physical cameras",
+    "full_circular_fov_degrees": 200,
+    "projection": "r = f * theta, theta_max = 100 degrees",
+    "site_frame": "MuJoCo/OpenGL: +X image right, +Y image up, -Z optical forward",
+    "nominal_pupil_outward_from_holder_face_mm": 7,
+    "pupil_basis": "Centered on the CAD cover opening; 7 mm outward from the holder face, 2 mm beyond the cover. Axial position, actual lens model, sensor crop and distortion are unmeasured.",
+    "camera_center_z_mm": -101.742515587221,
+    "front_holder_face_y_mm": 5.9000003580701,
+    "rear_rotation_axis_y_mm": 62.0000003580701,
+    "camera_names": ["fisheye_front", "fisheye_back"],
+    "mjcf_camera_fovy_degrees": 90,
+    "renderer": "examples/render_fixed_cameras.py; six coincident 90-degree views, reprojected onto a 200-degree circular image"
+  },
+  "dynamics": {
+    "status": "nominal, not mass-calibrated",
+    "assembly_mass_kg": 0.18,
+    "inertia_method": "Uniform 50 x 126.2 x 88.5 mm bounding box, center near CAD mesh centroid",
+    "collisions": "Conservative neck, bridge and camera-box primitives, not connector-level contact geometry"
+  },
+  "limits": [
+    "Original body25 torso and limbs are retained, including torso shell geometry not present in the installation photos.",
+    "Printed mount and both covers use the exact v4 native-coordinate meshes; board and lens visuals are nominal primitives.",
+    "No claim of real-camera pixel accuracy, calibration, cable occlusion, physical clearance or load qualification."
+  ]
+}

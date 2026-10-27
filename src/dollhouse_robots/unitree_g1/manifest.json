@@ -24,6 +24,15 @@
       "total_actuators": 27,
       "mjcf": "g1_body25_head2.xml",
       "retarget_config": "retarget/g1_body25_head2/soma_to_g1_retargeter_config.json"
+    },
+    "dollhouse_g1_27dof_with_camera_mount": {
+      "body_dof": 25,
+      "head_dof": 0,
+      "total_actuators": 25,
+      "mjcf": "dollhouse_g1_27dof_with_camera_mount.xml",
+      "retarget_config": "retarget/dollhouse_g1_27dof_with_camera_mount/soma_to_g1_retargeter_config.json",
+      "camera_mount_metadata": "dual-camera-mount.json",
+      "calibration_status": "nominal, not measured on Leaning Tree"
     }
   }
 }

@@ -11,3 +11,17 @@ BSD 3-Clause License:
 The canonical Dollhouse variants add custom head joints, custom head and hand
 geometry, collision definitions, actuator metadata, and retargeting metadata.
 Those additions are covered by this repository's LICENSE.
+
+The fixed dual-camera variant includes unchanged STL exports from
+https://github.com/DollhouseRobotics/hardware:
+
+- `parts/head-module/dual-camera-neck-mount.stl`, v4 derived from native
+  `neck-adapter` object 422 in the September 25, 2026 head-module STEP export.
+- `parts/head-module/camera-cover.stl`, exported from the user-supplied
+  `neck-v2-camera-cover.step` without geometry edits.
+
+The original head-module CAD is from
+https://cad.onshape.com/documents/bef14ae1bcdcb17e3ad8d1d6/w/94ac311f8769171e80bc9526/e/7203dcc260522014059f75d3.
+The source paths and SHA-256 hashes are recorded in
+`src/dollhouse_robots/unitree_g1/dual-camera-mount.json`. Mesh coordinates remain
+in the native millimeter frame; MJCF applies the scale and assembly transforms.

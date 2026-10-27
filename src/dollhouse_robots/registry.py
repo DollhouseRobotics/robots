@@ -20,6 +20,8 @@ _ALIASES: Final = {
   "g1_25dof": "g1_body25_head2",
   "g1_25dof_head": "g1_body25_head2",
   "g1_29dof": "g1_body25_head2",
+  "dollhouse_g1_27dof_with_camera_mount": "dollhouse_g1_27dof_with_camera_mount",
+  "g1_body25_head0_dual_camera": "dollhouse_g1_27dof_with_camera_mount",
 }
 
 
@@ -47,7 +49,8 @@ class RobotDefinition:
 def available_robots() -> tuple[str, ...]:
   """Return canonical IDs. Aliases are intentionally omitted."""
 
-  return ("g1_body23_head2", "g1_body25_head2")
+  with (_ROOT / "manifest.json").open(encoding="utf-8") as handle:
+    return tuple(json.load(handle)["robots"])
 
 
 def get_robot(name: str) -> RobotDefinition:
@@ -60,14 +63,13 @@ def get_robot(name: str) -> RobotDefinition:
     choices = ", ".join(available_robots())
     raise ValueError(f"Unknown robot {name!r}; expected one of: {choices}") from exc
 
-  body_dof = 23 if robot_id == "g1_body23_head2" else 25
+  with (_ROOT / "manifest.json").open(encoding="utf-8") as handle:
+    definition = json.load(handle)["robots"][robot_id]
   return RobotDefinition(
     id=robot_id,
-    body_dof=body_dof,
-    head_dof=2,
-    mjcf_path=_ROOT / f"{robot_id}.xml",
+    body_dof=definition["body_dof"],
+    head_dof=definition["head_dof"],
+    mjcf_path=_ROOT / definition["mjcf"],
     assets_dir=_ROOT / "assets",
-    retarget_config_path=(
-      _ROOT / "retarget" / robot_id / "soma_to_g1_retargeter_config.json"
-    ),
+    retarget_config_path=_ROOT / definition["retarget_config"],
   )
